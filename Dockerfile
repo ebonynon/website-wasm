@@ -20,3 +20,17 @@ RUN set -eux; \
     rustup --version; \
     cargo --version; \
     rustc --version;
+
+RUN mkdir /usr/app
+COPY . /usr/app
+
+# Create app directory
+WORKDIR /usr/app
+
+# Install dependencies, build n run
+RUN cargo +nightly install miniserve \
+    ./build.sh \
+    ./run.sh
+
+# New
+EXPOSE 8080  
