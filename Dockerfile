@@ -8,11 +8,10 @@ RUN apk add --no-cache \
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
-    RUST_VERSION=nightly    \
-    RUSTUP-VERSION=1.22.1
+    RUST_VERSION=nightly
 
 RUN set -eux; \
-    url="https://static.rust-lang.org/rustup/archive/%%RUSTUP-VERSION%%/x86_64-unknown-linux-musl/rustup-init"; \
+    url="https://static.rust-lang.org/rustup/archive/1.22.1/x86_64-unknown-linux-musl/rustup-init"; \
     wget "$url"; \
     echo "%%RUSTUP-SHA256%% *rustup-init" | sha256sum -c -; \
     chmod +x rustup-init; \
