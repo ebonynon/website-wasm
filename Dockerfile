@@ -13,7 +13,6 @@ ENV RUSTUP_HOME=/usr/local/rustup \
 RUN set -eux; \
     url="https://static.rust-lang.org/rustup/archive/1.22.1/x86_64-unknown-linux-musl/rustup-init"; \
     wget "$url"; \
-    echo "%%RUSTUP-SHA256%% *rustup-init" | sha256sum -c -; \
     chmod +x rustup-init; \
     ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host x86_64-unknown-linux-musl; \
     rm rustup-init; \
