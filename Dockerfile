@@ -1,25 +1,33 @@
-FROM alpine:3.9
-
-RUN apk add --no-cache \
-    ca-certificates \
-    gcc \
-    musl-dev
+FROM debian:buster-slim
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
-    PATH=/usr/local/cargo/bin:$PATH \
-    RUST_VERSION=nightly
+    PATH=/usr/local/cargo/bin:$PATH
 
 RUN set -eux; \
-    url="https://static.rust-lang.org/rustup/archive/1.22.1/x86_64-unknown-linux-musl/rustup-init"; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        gcc \
+        libc6-dev \
+        wget \
+        curl \
+        ; \
+    \
+    url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
     wget "$url"; \
     chmod +x rustup-init; \
-    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host x86_64-unknown-linux-musl; \
+    ./rustup-init -y --no-modify-path --default-toolchain nightly; \
     rm rustup-init; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
     rustup --version; \
     cargo --version; \
-    rustc --version;
+    rustc --version; \
+    \
+    apt-get remove -y --auto-remove \
+        wget \
+        ; \
+    rm -rf /var/lib/apt/lists/*;
 
 RUN mkdir /usr/app
 COPY . /usr/app
@@ -28,9 +36,11 @@ COPY . /usr/app
 WORKDIR /usr/app
 
 # Install dependencies, build n run
-RUN cargo +nightly install miniserve \
-    ./build.sh \
-    ./run.sh
+RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
+RUN cargo +nightly install miniserve
+RUN build/build.sh
 
 # New
-EXPOSE 8080  
+EXPOSE 8080
+#CMD [ "bash", "run.sh" ]
+ENTRYPOINT ["/bin/bash", "/usr/app/run.sh"]
